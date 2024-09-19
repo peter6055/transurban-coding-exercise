@@ -12,7 +12,7 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
 
     // create a dynamodb table
     const addressTable = new Table(this, 'address', {
-        partitionKey: { name: 'userId', type: AttributeType.STRING },
+        partitionKey: { name: 'id', type: AttributeType.STRING },
         removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
