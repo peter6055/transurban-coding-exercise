@@ -20,8 +20,8 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
                     partitionKey: {name: 'pk', type: AttributeType.STRING},
                 },
                 {
-                  indexName: 'postcode',
-                  partitionKey: {name: 'pk', type: AttributeType.STRING},
+                    indexName: 'postcode',
+                    partitionKey: {name: 'pk', type: AttributeType.STRING},
                 },
             ],
             removalPolicy: cdk.RemovalPolicy.DESTROY,

@@ -1,4 +1,4 @@
-import {uuid}  from 'uuidv4';
+import {uuid} from 'uuidv4';
 import {PutCommand} from "@aws-sdk/lib-dynamodb";
 import {DynamoDB} from "@aws-sdk/client-dynamodb";
 import {Address, UserId} from "../../../types";
@@ -12,29 +12,29 @@ export async function create(body: string | null) {
     if (!body) {
         return {
             statusCode: 400,
-            body: JSON.stringify({ message: 'Missing request body' }),
+            body: JSON.stringify({message: 'Missing request body'}),
         };
     }
 
 
     // Parse the body
     const bodyParsed = JSON.parse(body) as Body;
-    if(
+    if (
         !bodyParsed.userId ||
         !bodyParsed.address ||
         !bodyParsed.address.line ||
         !bodyParsed.address.suburb ||
         !bodyParsed.address.state ||
         !bodyParsed.address.postcode
-    ){
+    ) {
         return {
             statusCode: 400,
-            body: JSON.stringify({ message: 'Missing necessary request body' }),
+            body: JSON.stringify({message: 'Missing necessary request body'}),
         };
     }
 
 
-    // Creat the address
+    // Create the database
     const dynamodb = new DynamoDB({});
     await dynamodb.send(
         new PutCommand({
@@ -49,6 +49,6 @@ export async function create(body: string | null) {
 
     return {
         statusCode: 200,
-        body: JSON.stringify({ message: 'Address Created!' }),
+        body: JSON.stringify({message: 'Address Created!'}),
     };
 }
