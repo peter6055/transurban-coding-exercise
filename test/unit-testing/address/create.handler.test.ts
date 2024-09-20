@@ -1,5 +1,5 @@
 import 'aws-sdk-client-mock-jest';
-import { mockClient } from 'aws-sdk-client-mock';
+import {mockClient} from 'aws-sdk-client-mock';
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
 import {PutCommand} from "@aws-sdk/lib-dynamodb";
 import {create} from "../../../resources/handlers/address/create";
@@ -24,7 +24,6 @@ const data = {
 describe('Test Create Address Successful', () => {
     let response: any;
 
-    // Create a mock for S3 at the beginning of your describe block.
     beforeAll(async () => {
         process.env.TABLE_NAME = 'address'
     });
@@ -39,7 +38,7 @@ describe('Test Create Address Successful', () => {
         response = await create(JSON.stringify(data));
         expect(response).toEqual({
             statusCode: 201,
-            body: JSON.stringify({ message: 'Address Created!' }),
+            body: JSON.stringify({message: 'Address Created!'}),
         });
     });
 
@@ -64,10 +63,9 @@ describe('Test Create Address Successful', () => {
 
 describe('Test Create Address Fail', () => {
     let response: any;
-    const MISSING_BODY_ERROR_MSG = { message: 'Missing request body' };
-    const MISSING_BODY_COMPONENTS_ERROR_MSG = { message: 'Missing necessary request body' };
+    const MISSING_BODY_ERROR_MSG = {message: 'Missing request body'};
+    const MISSING_BODY_COMPONENTS_ERROR_MSG = {message: 'Missing necessary request body'};
 
-    // Create a mock for S3 at the beginning of your describe block.
     beforeAll(async () => {
         process.env.TABLE_NAME = 'address'
     });
@@ -84,7 +82,6 @@ describe('Test Create Address Fail', () => {
             body: JSON.stringify(MISSING_BODY_ERROR_MSG),
         });
     });
-
 
     it('should return 400 when no user Id', async () => {
         response = await create(JSON.stringify({
@@ -140,7 +137,6 @@ describe('Test Create Address Fail', () => {
             body: JSON.stringify(MISSING_BODY_COMPONENTS_ERROR_MSG),
         });
     })
-
 
     it('should return 400 when no postcode', async () => {
         response = await create(JSON.stringify({
