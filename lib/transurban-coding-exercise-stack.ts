@@ -11,7 +11,8 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
         super(scope, id, props);
 
         // create a dynamodb table
-        const addressTable = new TableV2(this, 'address', {
+        const addressTable = new TableV2(this, 'TU_DDB_Table_Address', {
+            tableName: 'TU_DDB_Table_Address',
             partitionKey: {name: 'userId', type: AttributeType.STRING},
             sortKey: {name: 'id', type: AttributeType.STRING},
             globalSecondaryIndexes: [
@@ -29,8 +30,8 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
 
 
         // create an api gateway
-        const api = new RestApi(this, 'RestAPI', {
-            restApiName: 'TransurbanCodingExerciseAPI',
+        const api = new RestApi(this, 'TU_API_Gateway', {
+            restApiName: 'TU_API_Gateway',
             defaultCorsPreflightOptions: {
                 allowOrigins: Cors.ALL_ORIGINS,
                 allowMethods: Cors.ALL_METHODS,
@@ -39,8 +40,8 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
         });
 
         // create a usage plan
-        const plan = api.addUsagePlan('UsagePlan', {
-            name: 'Usage Plan',
+        const plan = api.addUsagePlan('TU_API_UsagePlan', {
+            name: 'TU_API_UsagePlan',
             apiStages: [
                 {
                     api,
@@ -50,12 +51,13 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
         });
 
         // create an api key for testing purposes
-        const apiKey = api.addApiKey('ApiKey');
+        const apiKey = api.addApiKey('TU_API_Key');
         plan.addApiKey(apiKey);
 
 
         // create a lambda function
-        const addressLambda = new NodejsFunction(this, 'addressLambda', {
+        const addressLambda = new NodejsFunction(this, 'TU_Lambda_Address', {
+            functionName: 'TU_Lambda_Address',
             entry: 'resources/endpoints/address.ts',
             handler: 'handler',
             environment: {
@@ -66,19 +68,21 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
 
 
         // create the api gateway resources and attach it to the lambda function
-        const posts = api.root.addResource('address');
+        const address = api.root.addResource('address');
 
-        posts.addResource('create').addMethod('POST', new LambdaIntegration(addressLambda), {
+        // create endpoint POST /address/create
+        address.addResource('create').addMethod('POST', new LambdaIntegration(addressLambda), {
             apiKeyRequired: true,
         });
 
-        posts.addResource('find').addMethod('POST', new LambdaIntegration(addressLambda), {
+        // create endpoint POST /address/find
+        address.addResource('find').addMethod('POST', new LambdaIntegration(addressLambda), {
             apiKeyRequired: true,
         });
 
 
         // output api key
-        new CfnOutput(this, 'API Key ID', {
+        new CfnOutput(this, 'APIKeyID', {
             value: apiKey.keyId,
         });
 
