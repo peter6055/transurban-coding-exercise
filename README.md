@@ -55,6 +55,7 @@ aws sso login
 
 ## Infrastructure Diagram
 
+
 ## API Documentation
 ### Endpoints
 | Method | URL               | Description                                                               |
@@ -79,3 +80,6 @@ Notes: Inspired by https://github.com/ml-archive/readme/blob/master/Documentatio
 
 
 
+## QA
+- Type Coverage `type-coverage` is used to check the type coverage of the project.
+- 
