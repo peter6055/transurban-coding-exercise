@@ -48,7 +48,7 @@ export async function create(body: string | null) {
     );
 
     return {
-        statusCode: 200,
+        statusCode: 201,
         body: JSON.stringify({message: 'Address Created!'}),
     };
 }
