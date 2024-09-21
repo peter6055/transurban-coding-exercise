@@ -1,12 +1,6 @@
 import {uuid} from 'uuidv4';
 import {PutCommand} from "@aws-sdk/lib-dynamodb";
 import {DynamoDB} from "@aws-sdk/client-dynamodb";
-import {Address, UserId} from "../../../types";
-
-type Body = {
-    userId: UserId,
-    address: Address
-}
 
 export async function create(body: string | null) {
     if (!body) {
@@ -17,8 +11,9 @@ export async function create(body: string | null) {
     }
 
 
-    // Parse the body
-    const bodyParsed = JSON.parse(body) as Body;
+    // This code ensure @aws-cdk/integ-tests-alpha to be able to pass the test data
+    const bodyParsed = typeof body === 'string' ? JSON.parse(body) : body;
+
     if (
         !bodyParsed.userId ||
         !bodyParsed.address ||

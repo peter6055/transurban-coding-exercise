@@ -1,8 +1,4 @@
-export interface Address {
-    line: string;
-    suburb: string;
-    state: string;
-    postcode: string;
+export enum BuildState{
+    TEST = 'TEST',
+    PROD = 'PROD'
 }
-
-export type UserId = string;

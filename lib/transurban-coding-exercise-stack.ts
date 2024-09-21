@@ -1,18 +1,39 @@
 import * as cdk from 'aws-cdk-lib';
+import {CfnOutput} from 'aws-cdk-lib';
 import {Construct} from 'constructs';
 import {AttributeType, TableV2} from 'aws-cdk-lib/aws-dynamodb';
 import {ApiKeySourceType, Cors, LambdaIntegration, RestApi, UsagePlan} from "aws-cdk-lib/aws-apigateway";
 import {NodejsFunction} from "aws-cdk-lib/aws-lambda-nodejs";
-import {CfnOutput} from "aws-cdk-lib";
+import * as path from "path";
+import {BuildState} from "../types";
 
 
 export class TransurbanCodingExerciseStack extends cdk.Stack {
-    constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+    apiEndpointOutput: string;
+
+    constructor(scope: Construct, id: string, props?: cdk.StackProps, buildState?: BuildState) {
         super(scope, id, props);
 
+        // define the build state to avoid name conflict
+        let buildString: string = "";
+        if (buildState === BuildState.PROD) {
+            buildString = 'PROD_';
+        } else if (buildState === BuildState.TEST) {
+            buildString = 'TEST_';
+        }
+
+        // expose the stack item
+        var addressTable: TableV2;
+        var api: RestApi;
+        var plan: UsagePlan;
+        var apiKey: cdk.aws_apigateway.IApiKey
+        var addressLambda: NodejsFunction
+        var addressAPIResource: cdk.aws_apigateway.Resource
+
+
         // create a dynamodb table
-        const addressTable = new TableV2(this, 'TU_DDB_Table_Address', {
-            tableName: 'TU_DDB_Table_Address',
+        addressTable = new TableV2(this, buildString + 'TU_DDB_Table_Address', {
+            tableName: buildString + 'TU_DDB_Table_Address',
             partitionKey: {name: 'userId', type: AttributeType.STRING},
             sortKey: {name: 'id', type: AttributeType.STRING},
             globalSecondaryIndexes: [
@@ -30,8 +51,8 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
 
 
         // create an api gateway
-        const api = new RestApi(this, 'TU_API_Gateway', {
-            restApiName: 'TU_API_Gateway',
+        api = new RestApi(this, buildString + 'TU_API_Gateway', {
+            restApiName: buildString + 'TU_API_Gateway',
             defaultCorsPreflightOptions: {
                 allowOrigins: Cors.ALL_ORIGINS,
                 allowMethods: Cors.ALL_METHODS,
@@ -39,26 +60,10 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
             apiKeySourceType: ApiKeySourceType.HEADER,
         });
 
-        // create a usage plan
-        const plan = api.addUsagePlan('TU_API_UsagePlan', {
-            name: 'TU_API_UsagePlan',
-            apiStages: [
-                {
-                    api,
-                    stage: api.deploymentStage,
-                }
-            ],
-        });
-
-        // create an api key for testing purposes
-        const apiKey = api.addApiKey('TU_API_Key');
-        plan.addApiKey(apiKey);
-
-
         // create a lambda function
-        const addressLambda = new NodejsFunction(this, 'TU_Lambda_Address', {
-            functionName: 'TU_Lambda_Address',
-            entry: 'resources/endpoints/address.ts',
+        addressLambda = new NodejsFunction(this, buildString + 'TU_Lambda_Address', {
+            functionName: buildString + 'TU_Lambda_Address',
+            entry: path.join(__dirname, '../resources/endpoints/address.ts'),
             handler: 'handler',
             environment: {
                 TABLE_NAME: addressTable.tableName,
@@ -68,24 +73,42 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
 
 
         // create the api gateway resources and attach it to the lambda function
-        const address = api.root.addResource('address');
+        addressAPIResource = api.root.addResource('address');
 
         // create endpoint POST /address/create
-        address.addResource('create').addMethod('POST', new LambdaIntegration(addressLambda), {
-            apiKeyRequired: true,
+        addressAPIResource.addResource('create').addMethod('POST', new LambdaIntegration(addressLambda), {
+            apiKeyRequired: buildState === BuildState.PROD, // required in production only
         });
 
         // create endpoint POST /address/find
-        address.addResource('find').addMethod('POST', new LambdaIntegration(addressLambda), {
-            apiKeyRequired: true,
+        addressAPIResource.addResource('find').addMethod('POST', new LambdaIntegration(addressLambda), {
+            apiKeyRequired: buildState === BuildState.PROD, // required in production only
         });
 
 
-        // output api key
-        new CfnOutput(this, 'APIKeyID', {
-            value: apiKey.keyId,
-        });
 
+        if(buildState === BuildState.PROD){
+            // create a usage plan
+            plan = api.addUsagePlan(buildString + 'TU_API_UsagePlan', {
+                name: buildString + 'TU_API_UsagePlan',
+                apiStages: [
+                    {
+                        api,
+                        stage: api.deploymentStage,
+                    }
+                ],
+            });
 
+            // create an api key for testing purposes
+            apiKey = api.addApiKey(buildString + 'TU_API_Key');
+            plan.addApiKey(apiKey);
+
+            // output api key
+            new CfnOutput(this, buildString + 'APIKeyID', {
+                value: apiKey.keyId,
+            });
+        }
+
+        this.apiEndpointOutput = api.url;
     }
 }

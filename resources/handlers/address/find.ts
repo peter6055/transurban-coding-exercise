@@ -1,15 +1,6 @@
 import {QueryCommand} from "@aws-sdk/lib-dynamodb";
 import {DynamoDB} from "@aws-sdk/client-dynamodb";
-import {UserId} from "../../../types";
 import {QueryCommandInput} from "@aws-sdk/lib-dynamodb/dist-types/commands/QueryCommand";
-
-type Body = {
-    userId: UserId,
-    address: {
-        suburb: string,
-        postcode: string,
-    }
-}
 
 export async function find(body: string | null) {
     if (!body) {
@@ -20,8 +11,10 @@ export async function find(body: string | null) {
     }
 
 
-    // Parse the body
-    const bodyParsed = JSON.parse(body) as Body;
+    // This code ensure @aws-cdk/integ-tests-alpha to be able to pass the test data
+    const bodyParsed = typeof body === 'string' ? JSON.parse(body) : body;
+
+
     if (!bodyParsed.userId) {
         return {
             statusCode: 400,
