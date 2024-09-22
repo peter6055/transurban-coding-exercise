@@ -78,8 +78,8 @@ Notes: Inspired by https://github.com/ml-archive/readme/blob/master/Documentatio
 ## Folder Structure
 ````
 .
-├── bin                                     # CDK stack entry point (cdk deploy start from here)
-├── lib                                     # CDK template files
+├── bin                                     # CDK stack creation entry point (cdk deploy start from here)
+├── lib                                     # CDK stack
 ├── resources                               # Source files
 │   ├── endpoints                               # API Gateway endpoints
 │   └── handlers                                # Lambda handlers
