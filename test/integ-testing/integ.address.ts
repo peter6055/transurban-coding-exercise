@@ -22,27 +22,55 @@ const integ = new IntegTest(app, 'IntegTest', {
     testCases: [stack],
 });
 
-
 /**
- * - ExpectedResult.objectLike assertion success when:
- *   - The object is `partially` match key-value pair as the expected object AND
- *   - If it is an array, the element count equal to the expected element count
+ * Provides a brief explanation of the ExpectedResult.objectLike assertion.
  *
- * - E.g.
- *   - The array [{a: 1, b: 2}, {a: 3, b:4}] is expected to match [{a: 1}, {a: 2}]
- *     because the key-value pair that `partially` match the expected object and the element count is equal
+ * The assertion succeeds when:
+ * - It finds the specified key-value pair within the object (match instead of equal) AND
+ * - The element count matches the expected element count in the object array.
  *
- *   - The array [{a: 1, b: 2}, {a: 3, b:4}] is not expected to match [{a: 1}]
- *     because even though the key-value pair that `partially` match the expected object, the element count is not equal
- *     (there are two objects in the array but only one object in the expected object)
+ * @example
+ * // Actual result
+ * const actual = {
+ *   status: 200,
+ *   body: [....]
+ * };
  *
+ * // Pass, found status key-value pair in the object
+ * ExpectedResult.exact({
+ *   status: 200,
+ * });
  *
- * - If you received an error like `!! Too many elements in array (expecting 1, got 4)` on the ExpectedResult.objectLike assertion
- *   this means your assertion is failed because the element count is not equal
+ * @example
+ * // Actual result
+ * const actual = {
+ *   body: [
+ *     { address: '123 Line street' },
+ *     { address: '789 Line street' },
+ *   ]
+ * };
  *
- * !! Therefore, you can use this assertion to check the object in the array without knowing the object ID !!
+ * // Fails because the element count is not equal
+ * // Received `!! Too many elements in array (expecting 1, got 4)` error
+ * ExpectedResult.exact({
+ *   body: [
+ *     { address: '123 Line street' }
+ *   ]
+ * });
+ *
+ * @example
+ * // Actual result
+ * const actual = {
+ *   id: '123-234-46-456', // Auto-generated id, we don't know the value
+ *   address: '123 Line street', // We only know the address
+ * };
+ *
+ * // Pass because it can find the address key-value pair in the object
+ * // This allows you to check the object in the array without knowing the object ID.
+ * ExpectedResult.exact({
+ *   address: '123 Line street',
+ * });
  */
-
 
 // TEST001 - should return 201 when we create an address
 integ.assertions.httpApiCall(
@@ -63,7 +91,6 @@ integ.assertions.httpApiCall(
     body: {message: "Address Created!"},
     status: 201,
 }));
-
 
 
 // TEST002 - should return 404 when we try to find an address that does not exist
@@ -123,7 +150,6 @@ integ.assertions.httpApiCall(
 );
 
 
-
 // TEST004 - should return condoning address(search by postcode + userId) when we try to the new added address
 integ.assertions.httpApiCall(
     `${stack.apiEndpointOutput}address/create/`,
@@ -166,8 +192,6 @@ integ.assertions.httpApiCall(
 );
 
 
-
-
 // TEST005 - should return condoning address(search by suburb + userId) when we try to the new added address
 integ.assertions.httpApiCall(
     `${stack.apiEndpointOutput}address/create/`,
@@ -208,3 +232,91 @@ integ.assertions.httpApiCall(
         status: 200,
     }))
 );
+
+
+/**
+ *  The following test case is commented out because the assertAtPath is not working as expected.
+ *  I believe the usage of assertAtPath of httpApiCall is currently not working as expected.
+ *
+ *  According to the GtiHub discussion
+ *  (https://github.com/aws/aws-cdk/discussions/30325): Some of else face the same issue and the current library of assertAtPath is empty.
+ *
+ *  The test should be working as expected if we use the ExpectedResult.objectLike assertion.
+ *  Therefore, I will keep the code as it is and will update the test case when the library is updated.
+ *  Please keep track of the issue in the GitHub discussion.
+ *
+ */
+
+// TEST006 - should return 3 address belong to user when we try to find the address by userId
+// const data = [
+//     {
+//         userId: '006',
+//         address: {
+//             line: '607 High St',
+//             suburb: 'Thornbury',
+//             state: 'VIC',
+//             postcode: '3071',
+//         }
+//     },
+//     {
+//         userId: '006',
+//         address: {
+//             line: '39 Darebin Rd',
+//             suburb: 'Thornbury',
+//             state: 'VIC',
+//             postcode: '3071',
+//         }
+//     },
+//     {
+//         userId: '006',
+//         address: {
+//             line: '301 High St',
+//             suburb: 'Northcote',
+//             state: 'VIC',
+//             postcode: '3070',
+//         }
+//     }, {
+//         userId: '0061',
+//         address: {
+//             line: '216 High St',
+//             suburb: 'Northcote',
+//             state: 'VIC',
+//             postcode: '3070',
+//         }
+//     }
+// ]
+//
+// const putRequests = data.map((item) => {
+//     return {
+//         PutRequest: {
+//             Item: {
+//                 id: {S: `${uuid()}`},
+//                 userId: {S: item.userId},
+//                 line: {S: item.address.line},
+//                 suburb: {S: item.address.suburb},
+//                 state: {S: item.address.state},
+//                 postcode: {S: item.address.postcode},
+//             }
+//         }
+//     }
+// });
+//
+// integ.assertions.awsApiCall(
+//     '@aws-sdk/client-dynamodb',
+//     'BatchWriteItemCommand',
+//     {
+//         RequestItems: {
+//             [stack.tableNameOutput]: putRequests,
+//         },
+//     }
+// ).next(
+//     integ.assertions.httpApiCall(
+//         `${stack.apiEndpointOutput}address/find/`,
+//         {
+//             method: 'POST',
+//             body: JSON.stringify({
+//                 userId: '006'
+//             }),
+//         }
+//     ).assertAtPath('body', ExpectedResult.stringLikeRegexp('hello'))
+// )

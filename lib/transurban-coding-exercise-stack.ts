@@ -10,6 +10,7 @@ import {BuildState} from "../types";
 
 export class TransurbanCodingExerciseStack extends cdk.Stack {
     apiEndpointOutput: string;
+    tableNameOutput: string;
 
     constructor(scope: Construct, id: string, props?: cdk.StackProps, buildState?: BuildState) {
         super(scope, id, props);
@@ -107,8 +108,10 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
             new CfnOutput(this, buildString + 'APIKeyID', {
                 value: apiKey.keyId,
             });
+        } else {
+            // expose this for testing purposes
+            this.apiEndpointOutput = api.url;
+            this.tableNameOutput = addressTable.tableName;
         }
-
-        this.apiEndpointOutput = api.url;
     }
 }
