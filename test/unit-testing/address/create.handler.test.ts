@@ -22,8 +22,6 @@ const data = {
 }
 
 describe('Test Create Address Successful', () => {
-    let response: any;
-
     beforeAll(async () => {
         process.env.TABLE_NAME = 'address'
     });
@@ -35,7 +33,7 @@ describe('Test Create Address Successful', () => {
 
 
     it('should return 201 and created message', async () => {
-        response = await create(JSON.stringify(data));
+        const response = await create(JSON.stringify(data));
         expect(response).toEqual({
             statusCode: 201,
             body: JSON.stringify({message: 'Address Created!'}),
@@ -44,8 +42,7 @@ describe('Test Create Address Successful', () => {
 
 
     it('should call DynamoDB with the correct command', async () => {
-        response = await create(JSON.stringify(data));
-        dynamoDBMock.on(PutCommand).resolves({});
+        await create(JSON.stringify(data));
         expect(dynamoDBMock).toHaveReceivedCommandWith(PutCommand, {
             TableName: process.env.TABLE_NAME,
             Item: expect.objectContaining({
@@ -62,7 +59,6 @@ describe('Test Create Address Successful', () => {
 
 
 describe('Test Create Address Fail', () => {
-    let response: any;
     const MISSING_BODY_ERROR_MSG = {message: 'Missing request body'};
     const MISSING_BODY_COMPONENTS_ERROR_MSG = {message: 'Missing necessary request body'};
 
@@ -76,7 +72,7 @@ describe('Test Create Address Fail', () => {
     });
 
     it('should return 400 when there are no body', async () => {
-        response = await create(null);
+        const response = await create(null);
         expect(response).toEqual({
             statusCode: 400,
             body: JSON.stringify(MISSING_BODY_ERROR_MSG),
@@ -84,7 +80,7 @@ describe('Test Create Address Fail', () => {
     });
 
     it('should return 400 when no user Id', async () => {
-        response = await create(JSON.stringify({
+        const response = await create(JSON.stringify({
             address: {
                 line: data.address.line,
                 suburb: data.address.suburb,
@@ -99,7 +95,7 @@ describe('Test Create Address Fail', () => {
     });
 
     it('should return 400 when no address components', async () => {
-        response = await create(JSON.stringify({
+        const response = await create(JSON.stringify({
             userId: data.userId
         }));
         expect(response).toEqual({
@@ -109,7 +105,7 @@ describe('Test Create Address Fail', () => {
     });
 
     it('should return 400 when no suburb', async () => {
-        response = await create(JSON.stringify({
+        const response = await create(JSON.stringify({
             userId: data.userId,
             address: {
                 line: data.address.line,
@@ -124,7 +120,7 @@ describe('Test Create Address Fail', () => {
     })
 
     it('should return 400 when no state', async () => {
-        response = await create(JSON.stringify({
+        const response = await create(JSON.stringify({
             userId: data.userId,
             address: {
                 line: data.address.line,
@@ -139,7 +135,7 @@ describe('Test Create Address Fail', () => {
     })
 
     it('should return 400 when no postcode', async () => {
-        response = await create(JSON.stringify({
+        const response = await create(JSON.stringify({
             userId: data.userId,
             address: {
                 line: data.address.line,
