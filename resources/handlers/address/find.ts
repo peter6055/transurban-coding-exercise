@@ -45,6 +45,7 @@ export async function find(body: string | null) {
                 "#postcode": "postcode"
             };
             input.ExpressionAttributeValues = {
+                // do not remove userId, since ExpressionAttributeValues will be overwritten
                 ":userId": bodyParsed.userId,
                 ":suburb": bodyParsed.address.suburb || "",
                 ":postcode": bodyParsed.address.postcode || "",
@@ -57,7 +58,7 @@ export async function find(body: string | null) {
     const dynamodb = new DynamoDB({});
     const response = await dynamodb.send(new QueryCommand(input));
 
-    if (response.Items?.length === 0) {
+    if(!response || !response.Items || response.Items.length === 0){
         return {
             statusCode: 404,
             body: JSON.stringify({message: 'Address not found'}),
