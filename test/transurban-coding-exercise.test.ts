@@ -1,15 +1,16 @@
 import * as cdk from 'aws-cdk-lib';
 import {Capture, Template} from 'aws-cdk-lib/assertions';
 import * as TransurbanCodingExercise from '../lib/transurban-coding-exercise-stack';
+import {BuildState} from "../types";
 
 const app = new cdk.App();
-const stack = new TransurbanCodingExercise.TransurbanCodingExerciseStack(app, 'TestStack');
+const stack = new TransurbanCodingExercise.TransurbanCodingExerciseStack(app, 'TestStack', {}, BuildState.PROD);
 const template = Template.fromStack(stack);
 
 
 test('Address DynamoDB template', () => {
     template.hasResourceProperties("AWS::DynamoDB::GlobalTable", {
-        TableName: "TU_DDB_Table_Address",
+        TableName: "PROD_TU_DDB_Table_Address",
         KeySchema: [
             {
                 "AttributeName": "userId",
@@ -53,7 +54,7 @@ test('Address DynamoDB template', () => {
 test('API Gateway template', () => {
     template.hasResourceProperties("AWS::ApiGateway::RestApi", {
         ApiKeySourceType: "HEADER",
-        Name: "TU_API_Gateway"
+        Name: "PROD_TU_API_Gateway"
     });
 });
 
@@ -62,7 +63,7 @@ test('API Usage Plan template', () => {
     const restApiIdCapture = new Capture();
 
     template.hasResourceProperties("AWS::ApiGateway::UsagePlan", {
-        UsagePlanName: "TU_API_UsagePlan",
+        UsagePlanName: "PROD_TU_API_UsagePlan",
         ApiStages: [
             {
                 ApiId: {
@@ -73,7 +74,7 @@ test('API Usage Plan template', () => {
     });
 
     // Check that the RestApiId is a string that contains "TU_API_Gateway", which is the name of the api gateway
-    expect(restApiIdCapture.asString()).toContain(`TUAPIGateway`);
+    expect(restApiIdCapture.asString()).toContain(`PRODTUAPIGateway`);
 });
 
 
@@ -93,7 +94,7 @@ test('API Key template', () => {
     });
 
     // Check that the RestApiId is a string that contains "TU_API_Gateway", which is the name of the api gateway
-    expect(restApiIdCapture.asString()).toContain(`TUAPIGateway`);
+    expect(restApiIdCapture.asString()).toContain(`PRODTUAPIGateway`);
 });
 
 
@@ -113,7 +114,7 @@ test('Lambda template', () => {
     });
 
     // Check that the RestApiId is a string that contains "TU_API_Gateway", which is the name of the api gateway
-    expect(tableNameCapture.asString()).toContain(`TUDDBTableAddress`);
+    expect(tableNameCapture.asString()).toContain(`PRODTUDDBTableAddress`);
 });
 
 
