@@ -48,13 +48,15 @@ aws sso login
     ```
 
 ## Infrastructure Diagram
+
 ![diagram.jpg](diagram.jpg)
 
 ## API Documentation
-** Please heading to /docs/api-doc.md **
 
+**Please heading to /docs/api-doc.md**
 
 ## Folder Structure
+
 ````
 .
 ├── bin                                     # CDK stack creation entry point (cdk deploy start from here)
@@ -70,8 +72,8 @@ aws sso login
 └── ...
 ````
 
-
 ## QA
+
 ### Type of Testing
 
 - `type-coverage` is used to check the type coverage of the project.
@@ -92,15 +94,22 @@ aws sso login
 ## Can be improved?
 
 ### Infrastructure Design
+
 - **API Gateway**: The API Gateway is open to the public, it is better to add a custom domain and enable the WAF to
   protect the API.
 - **CloudWatch**: It will be nice to setup and configure the CloudWatch to monitor the API Gateway and Lambda functions.
-  Also to send SMS/Email using SNS/SES when the error rate is high to ensure the system is healthy.
+  Also, to send SMS/Email using SNS/SES when the error rate is high to ensure the system is healthy.
+- The role of the project is too permissive (currently using admin account from my AWS account), it is better to
+  implement the least privilege principle
+  to ensure the security of the system (Only CloudFormation, Lambda, API Gateway permission).
+- High-availability and fault-tolerance should be considered when designing the infrastructure. For example, multi-AZ
+  deployment(DynamoDB), auto-scaling/load balancer (Lambda) and backup/restore strategy (Database).
 
 ### Testing
+
 - **Integration testing**: There are several drawback of current integration testing:
     - The test is using real AWS resources, it will be costly when the test cases are increased, also it not efficiency
-      compare to local testing environment. 
+      compare to local testing environment.
     - The integration testing library is not stable as it is currently in alpha version. It is better to use the stable
       version of the library to ensure the test is reliable. (e.g. `assertAtPath` is not working as expected)
     - I have bypass the access control when conducting the integration testing, it is better to implement the access
@@ -110,11 +119,13 @@ aws sso login
       automatically when the code is pushed to the repository.
     - Seeking an alternative way to test the integrating between Lambda and DynamoDB is necssary, as the current
       integration testing library is not stable.
-      - I will highly recommend to implement the local testing environment using `localstack` or `dynamodb-local` in the early stage of testing. Then move the deployment testing on the real
+      - I will highly recommend to implement the local testing environment using `localstack` or `dynamodb-local` in
+        the early stage of testing. Then move the deployment testing on the real
         AWS resources at later stage (staging).
       - Implemented other testing approaches such as `E2E testing` to test the whole system from the user perspective.
 
 ## Assumptions
+
 - The API key is created when deploying the CDK stack, a formal way of doing it in production environment is to
   automatically generate it when user try to login with their credential.
 - The find address API `POST /address/find`, params "suburb" and "state" are optional, the expression is OR between
