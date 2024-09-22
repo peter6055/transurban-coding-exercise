@@ -93,7 +93,7 @@ Notes: Inspired by https://github.com/ml-archive/readme/blob/master/Documentatio
   by `integ-tests-alpha`. We built a real AWS infrastructure and test the interaction between Lambda and DynamoDB.
   This resources will be destroyed after the test.
 
-## Can be improved
+## Can be improved?
 
 ### Infrastructure Design
 - **API Gateway**: The API Gateway is open to the public, it is better to add a custom domain and enable the WAF to
@@ -105,16 +105,19 @@ Notes: Inspired by https://github.com/ml-archive/readme/blob/master/Documentatio
 
 - **Integration testing**: There are several drawback of current integration testing:
     - The test is using real AWS resources, it will be costly when the test cases are increased, also it not efficiency
-      compare to local testing environment. I will highly recommend to implement the local testing environment
-      using `localstack` or `dynamodb-local` in the early stage of testing. Then move the deployment testing on the real
-      AWS resources at later stage (staging).
+      compare to local testing environment. 
     - The integration testing library is not stable as it is currently in alpha version. It is better to use the stable
-      version of the library to ensure the test is reliable.
+      version of the library to ensure the test is reliable. (e.g. `assertAtPath` is not working as expected)
     - I have bypass the access control when conducting the integration testing, it is better to implement the access
       control by `secret manager` or `VPC` to ensure the security of the system while doing testing.
 - **Testing approaches**:
     - The integration testing is not fully automated, it is better to have a CI/CD pipeline to run the integration test
       automatically when the code is pushed to the repository.
+    - Seeking an alternative way to test the integrating between Lambda and DynamoDB is necssary, as the current
+      integration testing library is not stable.
+      - I will highly recommend to implement the local testing environment using `localstack` or `dynamodb-local` in the early stage of testing. Then move the deployment testing on the real
+        AWS resources at later stage (staging).
+      - Implemented other testing approaches such as `E2E testing` to test the whole system from the user perspective.
 
 ## Assumptions
 
