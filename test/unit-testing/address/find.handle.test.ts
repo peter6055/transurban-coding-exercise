@@ -2,7 +2,7 @@ import 'aws-sdk-client-mock-jest';
 import {find} from "../../../resources/handlers/address/find";
 import {mockClient} from "aws-sdk-client-mock";
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
-import {GetCommand, PutCommand, QueryCommand} from "@aws-sdk/lib-dynamodb";
+import {QueryCommand} from "@aws-sdk/lib-dynamodb";
 
 const dynamoDBMock = mockClient(DynamoDBClient);
 
