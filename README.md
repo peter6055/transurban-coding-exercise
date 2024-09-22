@@ -74,8 +74,24 @@ Detail: https://documenter.getpostman.com/view/30661295/2sAXqs7NAg
 
 Notes: Inspired by https://github.com/ml-archive/readme/blob/master/Documentation/how-to-write-apis.md?plain=1
 
-## QA
 
+## Folder Structure
+````
+.
+├── bin                                     # CDK stack entry point (cdk deploy start from here)
+├── lib                                     # CDK template files
+├── resources                               # Source files
+│   ├── endpoints                               # API Gateway endpoints
+│   └── handlers                                # Lambda handlers
+├── test                                    # Automated tests (unit testing/integration testing)
+│   ├── inter-testing                           # Integration testing: AWS resources (Lambda/DynamoDB)
+│   ├── unit-testing                            # Unit testing: Lambda functions
+│   └── transurban-coding-exercise.test.ts      # Infrastructure testing: CDK template
+└── ...
+````
+
+
+## QA
 ### Type of Testing
 
 - `type-coverage` is used to check the type coverage of the project.
@@ -102,7 +118,6 @@ Notes: Inspired by https://github.com/ml-archive/readme/blob/master/Documentatio
   Also to send SMS/Email using SNS/SES when the error rate is high to ensure the system is healthy.
 
 ### Testing
-
 - **Integration testing**: There are several drawback of current integration testing:
     - The test is using real AWS resources, it will be costly when the test cases are increased, also it not efficiency
       compare to local testing environment. 
@@ -120,7 +135,6 @@ Notes: Inspired by https://github.com/ml-archive/readme/blob/master/Documentatio
       - Implemented other testing approaches such as `E2E testing` to test the whole system from the user perspective.
 
 ## Assumptions
-
 - The API key is created when deploying the CDK stack, a formal way of doing it in production environment is to
   automatically generate it when user try to login with their credential.
 - The find address API `POST /address/find`, params "suburb" and "state" are optional, the expression is OR between
