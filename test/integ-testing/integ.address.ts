@@ -318,5 +318,25 @@ integ.assertions.httpApiCall(
 //                 userId: '006'
 //             }),
 //         }
-//     ).assertAtPath('body', ExpectedResult.stringLikeRegexp('hello'))
+//     ).assertAtPath('body', ExpectedResult.stringLikeRegexp([{
+//                 userId: '006',
+//                 line: '607 High St',
+//                 suburb: 'Thornbury',
+//                 state: 'VIC',
+//                 postcode: '3071',
+//             },
+//             {
+//                 userId: '006',
+//                 line: '39 Darebin Rd',
+//                 suburb: 'Thornbury',
+//                 state: 'VIC',
+//                 postcode: '3071',
+//             },
+//             {
+//                 userId: '006',
+//                 line: '301 High St',
+//                 suburb: 'Northcote',
+//                 state: 'VIC',
+//                 postcode: '3070',
+//     }]))
 // )
