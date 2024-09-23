@@ -58,6 +58,24 @@ test('API Gateway template', () => {
     });
 });
 
+
+test('API Gateway account (bound with cloudwatch)', () => {
+    // tableNameCapture is a dynamic value, so we need to capture it
+    const cloudWatchRoleArnCapture = new Capture();
+
+    template.hasResourceProperties("AWS::ApiGateway::Account", {
+        CloudWatchRoleArn: {
+            "Fn::GetAtt": [
+                cloudWatchRoleArnCapture,
+                "Arn"
+            ]
+        }
+    });
+    // Check that the RestApiId is a string that contains "TUAPIGatewayCloudWatchRole", which is the name of the api gateway
+    expect(cloudWatchRoleArnCapture.asString()).toContain(`PRODTUAPIGatewayCloudWatchRole`);
+});
+
+
 test('API Usage Plan template', () => {
     // RestApiId is a dynamic value, so we need to capture it
     const restApiIdCapture = new Capture();

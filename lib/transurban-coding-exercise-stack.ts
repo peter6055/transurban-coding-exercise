@@ -56,6 +56,7 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
 
         // ---------------- create an api gateway ----------------
         const api: RestApi = new RestApi(this, buildString + 'TU_API_Gateway', {
+            cloudWatchRole: true,
             restApiName: buildString + 'TU_API_Gateway',
             defaultCorsPreflightOptions: {
                 allowOrigins: Cors.ALL_ORIGINS,
