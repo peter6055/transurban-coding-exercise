@@ -17,6 +17,7 @@ import {BuildState} from "../types";
 
 
 export class TransurbanCodingExerciseStack extends cdk.Stack {
+    // expose these for testing purposes
     apiEndpointOutput: string;
     tableNameOutput: string;
 
@@ -32,7 +33,8 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
         }
 
 
-        // create a dynamodb table
+
+        // ---------------- create a dynamodb table ----------------
         const addressTable: TableV2 = new TableV2(this, buildString + 'TU_DDB_Table_Address', {
             tableName: buildString + 'TU_DDB_Table_Address',
             partitionKey: {name: 'userId', type: AttributeType.STRING},
@@ -51,7 +53,8 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
         });
 
 
-        // create an api gateway
+
+        // ---------------- create an api gateway ----------------
         const api: RestApi = new RestApi(this, buildString + 'TU_API_Gateway', {
             restApiName: buildString + 'TU_API_Gateway',
             defaultCorsPreflightOptions: {
@@ -61,7 +64,9 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
             apiKeySourceType: ApiKeySourceType.HEADER,
         });
 
-        // create a lambda function
+
+
+        // ---------------- create a lambda function ----------------
         const addressLambda: NodejsFunction = new NodejsFunction(this, buildString + 'TU_Lambda_Address', {
             functionName: buildString + 'TU_Lambda_Address',
             entry: path.join(__dirname, '../resources/endpoints/address.ts'),
@@ -73,7 +78,8 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
         addressTable.grantReadWriteData(addressLambda);
 
 
-        // create the api gateway resources and attach it to the lambda function
+
+        // ---------------- create the api gateway resources and attach it to the lambda function ----------------
         const addressAPIResource: Resource = api.root.addResource('address');
 
         // create endpoint POST /address/create
@@ -87,7 +93,8 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
         });
 
 
-        // only the production build will have usage plan and api key
+
+        // ---------------- only the production build will have usage plan and api key ----------------
         if (buildState === BuildState.PROD) {
             // create a usage plan
             const plan: UsagePlan = api.addUsagePlan(buildString + 'TU_API_UsagePlan', {
@@ -100,8 +107,10 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
                 ],
             });
 
-            // create an api key for testing purposes
+            // create an api key
             const apiKey: IApiKey = api.addApiKey(buildString + 'TU_API_Key');
+
+            // add the api key to the usage plan
             plan.addApiKey(apiKey);
 
             // output api key
@@ -109,7 +118,6 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
                 value: apiKey.keyId,
             });
         } else {
-            // expose this for testing purposes
             this.apiEndpointOutput = api.url;
             this.tableNameOutput = addressTable.tableName;
         }
