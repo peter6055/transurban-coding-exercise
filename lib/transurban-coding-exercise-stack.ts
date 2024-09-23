@@ -2,7 +2,15 @@ import * as cdk from 'aws-cdk-lib';
 import {CfnOutput} from 'aws-cdk-lib';
 import {Construct} from 'constructs';
 import {AttributeType, TableV2} from 'aws-cdk-lib/aws-dynamodb';
-import {ApiKeySourceType, Cors, LambdaIntegration, RestApi, UsagePlan} from "aws-cdk-lib/aws-apigateway";
+import {
+    ApiKeySourceType,
+    Cors,
+    LambdaIntegration,
+    RestApi,
+    UsagePlan,
+    IApiKey,
+    Resource
+} from "aws-cdk-lib/aws-apigateway";
 import {NodejsFunction} from "aws-cdk-lib/aws-lambda-nodejs";
 import * as path from "path";
 import {BuildState} from "../types";
@@ -23,17 +31,9 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
             buildString = 'TEST_';
         }
 
-        // expose the stack item
-        var addressTable: TableV2;
-        var api: RestApi;
-        var plan: UsagePlan;
-        var apiKey: cdk.aws_apigateway.IApiKey
-        var addressLambda: NodejsFunction
-        var addressAPIResource: cdk.aws_apigateway.Resource
-
 
         // create a dynamodb table
-        addressTable = new TableV2(this, buildString + 'TU_DDB_Table_Address', {
+        const addressTable: TableV2 = new TableV2(this, buildString + 'TU_DDB_Table_Address', {
             tableName: buildString + 'TU_DDB_Table_Address',
             partitionKey: {name: 'userId', type: AttributeType.STRING},
             sortKey: {name: 'id', type: AttributeType.STRING},
@@ -52,7 +52,7 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
 
 
         // create an api gateway
-        api = new RestApi(this, buildString + 'TU_API_Gateway', {
+        const api: RestApi = new RestApi(this, buildString + 'TU_API_Gateway', {
             restApiName: buildString + 'TU_API_Gateway',
             defaultCorsPreflightOptions: {
                 allowOrigins: Cors.ALL_ORIGINS,
@@ -62,7 +62,7 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
         });
 
         // create a lambda function
-        addressLambda = new NodejsFunction(this, buildString + 'TU_Lambda_Address', {
+        const addressLambda: NodejsFunction = new NodejsFunction(this, buildString + 'TU_Lambda_Address', {
             functionName: buildString + 'TU_Lambda_Address',
             entry: path.join(__dirname, '../resources/endpoints/address.ts'),
             handler: 'handler',
@@ -74,7 +74,7 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
 
 
         // create the api gateway resources and attach it to the lambda function
-        addressAPIResource = api.root.addResource('address');
+        const addressAPIResource: Resource = api.root.addResource('address');
 
         // create endpoint POST /address/create
         addressAPIResource.addResource('create').addMethod('POST', new LambdaIntegration(addressLambda), {
@@ -87,10 +87,10 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
         });
 
 
-
-        if(buildState === BuildState.PROD){
+        // only the production build will have usage plan and api key
+        if (buildState === BuildState.PROD) {
             // create a usage plan
-            plan = api.addUsagePlan(buildString + 'TU_API_UsagePlan', {
+            const plan: UsagePlan = api.addUsagePlan(buildString + 'TU_API_UsagePlan', {
                 name: buildString + 'TU_API_UsagePlan',
                 apiStages: [
                     {
@@ -101,7 +101,7 @@ export class TransurbanCodingExerciseStack extends cdk.Stack {
             });
 
             // create an api key for testing purposes
-            apiKey = api.addApiKey(buildString + 'TU_API_Key');
+            const apiKey: IApiKey = api.addApiKey(buildString + 'TU_API_Key');
             plan.addApiKey(apiKey);
 
             // output api key
