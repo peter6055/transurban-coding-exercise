@@ -60,7 +60,7 @@ test('API Gateway template', () => {
 
 
 test('API Gateway account (bound with cloudwatch)', () => {
-    // tableNameCapture is a dynamic value, so we need to capture it
+    // cloudWatchRoleArn is a dynamic value, so we need to capture it
     const cloudWatchRoleArnCapture = new Capture();
 
     template.hasResourceProperties("AWS::ApiGateway::Account", {
