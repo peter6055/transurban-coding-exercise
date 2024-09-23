@@ -71,7 +71,8 @@ test('API Gateway account (bound with cloudwatch)', () => {
             ]
         }
     });
-    // Check that the RestApiId is a string that contains "TUAPIGatewayCloudWatchRole", which is the name of the api gateway
+
+    // Check that the arn reference match PRODTUAPIGatewayCloudWatchRole
     expect(cloudWatchRoleArnCapture.asString()).toContain(`PRODTUAPIGatewayCloudWatchRole`);
 });
 
@@ -91,7 +92,7 @@ test('API Usage Plan template', () => {
         ]
     });
 
-    // Check that the RestApiId is a string that contains "TU_API_Gateway", which is the name of the api gateway
+    // Check that the restAPI reference match PRODTUAPIGateway
     expect(restApiIdCapture.asString()).toContain(`PRODTUAPIGateway`);
 });
 
@@ -111,7 +112,7 @@ test('API Key template', () => {
         ]
     });
 
-    // Check that the RestApiId is a string that contains "TU_API_Gateway", which is the name of the api gateway
+    // Check that the restAPI reference match PRODTUAPIGateway
     expect(restApiIdCapture.asString()).toContain(`PRODTUAPIGateway`);
 });
 
@@ -131,10 +132,9 @@ test('Lambda template', () => {
         },
     });
 
-    // Check that the RestApiId is a string that contains "TU_API_Gateway", which is the name of the api gateway
+    // Check that the table name reference match PRODTUDDBTableAddress
     expect(tableNameCapture.asString()).toContain(`PRODTUDDBTableAddress`);
 });
-
 
 
 /*
