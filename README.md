@@ -53,7 +53,7 @@ aws sso login
 
 ## API Documentation
 
-**Please heading to /docs/api-doc.md**
+**Please heading to /doc/api-doc.md**
 
 ## Folder Structure
 
@@ -84,12 +84,12 @@ aws sso login
 
 - **Infrastructure testing**: Test the CDK template using aws-cdk assertions to ensure the generated CloudFormation
   template is correct.
-- **Unit testing**: Test the business logic of the Lambda functions (find handler/create handler). The test are
-  conducted by `aws-sdk-client-mock` and `jest`. It is more focusing on the return status code/body and the command
-  send to DynamoDB.
-- **Integration testing**: Test the work flow of creating and finding address. The test are conducted
-  by `integ-tests-alpha`. We built a real AWS infrastructure and test the interaction between Lambda and DynamoDB.
-  This resources will be destroyed after the test.
+- **Unit testing**: Test the business logic of the Lambda functions (find handler/create handler). The test is
+  conducted by `aws-sdk-client-mock` and `jest`. It is more focused on the return status code/body and the command
+  sent to DynamoDB.
+- **Integration testing**: Test the workflow of creating and finding addresses. The tests are conducted
+  by `integ-tests-alpha`. We built a real AWS infrastructure and tested the interaction between Lambda and DynamoDB.
+  These resources will be destroyed after the test.
 
 ## Can be improved?
 
@@ -97,36 +97,36 @@ aws sso login
 
 - **API Gateway**: The API Gateway is open to the public, it is better to add a custom domain and enable the WAF to
   protect the API.
-- **CloudWatch**: It will be nice to setup and configure the CloudWatch to monitor the API Gateway and Lambda functions.
+- **CloudWatch**: It will be nice to set up and configure the CloudWatch to monitor the API Gateway and Lambda functions.
   Also, to send SMS/Email using SNS/SES when the error rate is high to ensure the system is healthy.
-- The role of the project is too permissive (currently using admin account from my AWS account), it is better to
+- The role of the project is too permissive (currently using an admin account from my AWS account), it is better to
   implement the least privilege principle
   to ensure the security of the system (Only CloudFormation, Lambda, API Gateway permission).
-- High-availability and fault-tolerance should be considered when designing the infrastructure. For example, multi-AZ
+- High availability and fault tolerance should be considered when designing the infrastructure. For example, multi-AZ
   deployment(DynamoDB), auto-scaling/load balancer (Lambda) and backup/restore strategy (Database).
 
 ### Testing
 
-- **Integration testing**: There are several drawback of current integration testing:
-    - The test is using real AWS resources, it will be costly when the test cases are increased, also it not efficiency
-      compare to local testing environment.
-    - The integration testing library is not stable as it is currently in alpha version. It is better to use the stable
+- **Integration testing**: There are several drawbacks of current integration testing:
+    - The test is using real AWS resources, and it will be costly when the test cases are increased, also it is not efficient
+      compared to the local testing environment.
+    - The integration testing library is not stable as it is currently in the alpha version. It is better to use the stable
       version of the library to ensure the test is reliable. (e.g. `assertAtPath` is not working as expected)
-    - I have bypass the access control when conducting the integration testing, it is better to implement the access
+    - I have bypassed the access control when conducting the integration testing, it is better to implement the access
       control by `secret manager` or `VPC` to ensure the security of the system while doing testing.
 - **Testing approaches**:
     - The integration testing is not fully automated, it is better to have a CI/CD pipeline to run the integration test
       automatically when the code is pushed to the repository.
-    - Seeking an alternative way to test the integrating between Lambda and DynamoDB is necssary, as the current
+    - Seeking an alternative way to test the integration between Lambda and DynamoDB is necessary, as the current
       integration testing library is not stable.
-      - I will highly recommend to implement the local testing environment using `localstack` or `dynamodb-local` in
-        the early stage of testing. Then move the deployment testing on the real
-        AWS resources at later stage (staging).
+      - I will highly recommend implementing the local testing environment using `localstack` or `dynamodb-local` in
+        the early stage of testing. Then move the deployment testing to the real
+        AWS resources at a later stage (staging).
       - Implemented other testing approaches such as `E2E testing` to test the whole system from the user perspective.
 
 ## Assumptions
 
-- The API key is created when deploying the CDK stack, a formal way of doing it in production environment is to
-  automatically generate it when user try to login with their credential.
+- The API key is created when deploying the CDK stack, a formal way of doing it in the production environment is to
+  automatically generate it when the user tries to log in with their credential.
 - The find address API `POST /address/find`, params "suburb" and "state" are optional, the expression is OR between
   suburb and state.
