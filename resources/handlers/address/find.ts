@@ -2,7 +2,7 @@ import {QueryCommand} from "@aws-sdk/lib-dynamodb";
 import {DynamoDB} from "@aws-sdk/client-dynamodb";
 import {QueryCommandInput} from "@aws-sdk/lib-dynamodb/dist-types/commands/QueryCommand";
 
-export async function find(body: string | null) {
+export async function find(body: any) {
     if (!body) {
         return {
             statusCode: 400,

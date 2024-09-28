@@ -2,7 +2,7 @@ import {uuid} from 'uuidv4';
 import {PutCommand} from "@aws-sdk/lib-dynamodb";
 import {DynamoDB} from "@aws-sdk/client-dynamodb";
 
-export async function create(body: string | null) {
+export async function create(body: any) {
     if (!body) {
         return {
             statusCode: 400,
